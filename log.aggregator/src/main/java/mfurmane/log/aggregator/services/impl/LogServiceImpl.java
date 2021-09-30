@@ -5,6 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
 import mfurmane.log.aggregator.dto.Log;
 import mfurmane.log.aggregator.repositories.LogRepository;
 import mfurmane.log.aggregator.services.LogService;
@@ -21,15 +25,27 @@ public class LogServiceImpl implements LogService {
 	private LogParser parser;
 
 	@Override
-	public String registerLogs(String body) {
-		List<Log> logs = parser.parse(body);
+	public String registerLogs(String body, String application) {
+		List<Log> logs = parser.parse(body, application);
+		logs.forEach(log -> System.out.println(log.toString()));
 		logs.forEach(log -> repository.save(log));
 		return message.replace("?", Integer.valueOf(logs.size()).toString());
 	}
 
 	@Override
 	public String getLogs(String application, String startDate, String endDate, Boolean xml) {
-		// TODO Auto-generated method stub
+		List<Log> findAll = repository.findAll();
+		try {
+			if (xml) {
+				XmlMapper xmlMapper = new XmlMapper();
+				return xmlMapper.writeValueAsString(findAll);
+			} else {
+				ObjectMapper mapper = new ObjectMapper();
+				return mapper.writeValueAsString(findAll);
+			}
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 

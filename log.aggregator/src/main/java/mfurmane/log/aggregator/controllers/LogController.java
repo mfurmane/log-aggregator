@@ -16,8 +16,8 @@ public class LogController {
 	LogService logService;
 
 	@PostMapping("/log/register")
-	String registerLogs(@RequestBody String body) {
-		return logService.registerLogs(body);
+	String registerLogs(@RequestBody String body, @RequestParam(name="application") String application) {
+		return logService.registerLogs(body, application);
 	}
 
 	@GetMapping("/log/get")

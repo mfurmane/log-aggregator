@@ -1,4 +1,4 @@
-package mfurmane.log.aggregator.application;
+package mfurmane.log.aggregator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
