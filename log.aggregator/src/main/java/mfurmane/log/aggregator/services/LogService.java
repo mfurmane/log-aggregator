@@ -4,6 +4,6 @@ public interface LogService {
 
 	String registerLogs(String body, String application);
 
-	String getLogs(String application, String startDate, String endDate, Boolean xml);
+	String getLogs(String application, String startDate, String endDate, Boolean xml, int page, int pageSize);
 
 }

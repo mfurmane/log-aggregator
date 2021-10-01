@@ -16,15 +16,17 @@ public class LogController {
 	LogService logService;
 
 	@PostMapping("/log/register")
-	String registerLogs(@RequestBody String body, @RequestParam(name="application") String application) {
+	String registerLogs(@RequestBody String body, @RequestParam(name = "application") String application) {
 		return logService.registerLogs(body, application);
 	}
 
 	@GetMapping("/log/get")
 	String getLogs(@RequestParam(name = "application") String application,
 			@RequestParam(name = "startDate") String startDate, @RequestParam(name = "endDate") String endDate,
-			@RequestParam(name = "xml", defaultValue = "false") Boolean xml) {
-		return logService.getLogs(application, startDate, endDate, xml);
+			@RequestParam(name = "xml", defaultValue = "false") Boolean xml,
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "pageSize", defaultValue = "20") int pageSize) {
+		return logService.getLogs(application, startDate, endDate, xml, page, pageSize);
 	}
 
 }

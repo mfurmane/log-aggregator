@@ -1,8 +1,12 @@
 package mfurmane.log.aggregator.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,8 +37,11 @@ public class LogServiceImpl implements LogService {
 	}
 
 	@Override
-	public String getLogs(String application, String startDate, String endDate, Boolean xml) {
-		List<Log> findAll = repository.findAll();
+	public String getLogs(String application, String startDate, String endDate, Boolean xml, int page, int pageSize) {
+		LocalDateTime start = LocalDateTime.parse(startDate);
+		LocalDateTime end = LocalDateTime.parse(endDate);
+		Pageable pageable = PageRequest.of(page, pageSize);
+		List<Log> findAll = repository.findAllByApplicationAndTimeBetween(application, start, end, pageable);
 		try {
 			if (xml) {
 				XmlMapper xmlMapper = new XmlMapper();

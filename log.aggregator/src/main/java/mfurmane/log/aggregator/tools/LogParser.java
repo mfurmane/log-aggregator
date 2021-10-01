@@ -2,7 +2,6 @@ package mfurmane.log.aggregator.tools;
 
 import java.lang.System.Logger.Level;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,13 +41,12 @@ public class LogParser {
 	}
 
 	private LocalDateTime findTime(String line) {
-		String regex = "\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?";
+		String regex = "\\d{4}-\\d{2}-\\d{2}[\\sT]*\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(line);
 		if (matcher.find()) {
-			String dateString = matcher.group();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd[ [HH][:mm][:ss][.SSS]]");
-			return LocalDateTime.parse(dateString, formatter);
+			String dateString = matcher.group().replace(" ", "T");
+			return LocalDateTime.parse(dateString);
 		}
 		return null;
 	}
