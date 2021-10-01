@@ -2,7 +2,9 @@ package mfurmane.log.aggregator.tools;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,8 @@ class LogParserTest {
 		assertEquals(applicationName, log.getApplication());
 		assertEquals(Level.INFO, log.getLoggingLevel());
 		assertEquals("com.zaxxer.hikari.HikariDataSource", log.getSourceClass());
-		assertEquals(LocalDateTime.parse("2021-10-01T10:58:56.012"), log.getTime());
+		assertEquals(LocalTime.parse("10:58:56.012"), log.getTime());
+		assertEquals(LocalDate.parse("2021-10-01"), log.getDate());
 		assertEquals("2060 --- [ main] : HikariPool-1 - Start completed.", log.getContent());
 	}
 
@@ -37,7 +40,8 @@ class LogParserTest {
 	void testNoThreadFormat() {
 		List<Log> logList = parser.parse(noThreadFormat, applicationName);
 		Log log = logList.get(0);
-		assertEquals(LocalDateTime.parse("2021-10-01T10:58:56"), log.getTime());
+		assertEquals(LocalTime.parse("10:58:56"), log.getTime());
+		assertEquals(LocalDate.parse("2021-10-01"), log.getDate());
 		assertEquals("HikariPool-1 - Start completed.", log.getContent());
 	}
 
@@ -45,7 +49,8 @@ class LogParserTest {
 	void testNoDateFormat() {
 		List<Log> logList = parser.parse(noDateFormat, applicationName);
 		Log log = logList.get(0);
-		assertEquals(LocalDateTime.parse("1970-01-01T10:58:56"), log.getTime());
+		assertEquals(LocalTime.parse("10:58:56"), log.getTime());
+		assertEquals(null, log.getDate());
 		assertEquals("HikariPool-1 - Start completed.", log.getContent());
 	}
 
@@ -54,7 +59,8 @@ class LogParserTest {
 		List<Log> logList = parser.parse(noTimeAndClassFormat, applicationName);
 		Log log = logList.get(0);
 		assertEquals(null, log.getSourceClass());
-		assertEquals(LocalDateTime.parse("2021-10-01T00:00:00"), log.getTime());
+		assertEquals(null, log.getTime());
+		assertEquals(LocalDate.parse("2021-10-01"), log.getDate());
 		assertEquals("HikariPool-1 - Start completed.", log.getContent());
 	}
 
@@ -64,7 +70,8 @@ class LogParserTest {
 		Log log = logList.get(0);
 		assertEquals(Level.INFO, log.getLoggingLevel());
 		assertEquals("com.zaxxer.hikari.HikariDataSource", log.getSourceClass());
-		assertEquals(LocalDateTime.parse("2021-10-01T00:00:00"), log.getTime());
+		assertEquals(null, log.getTime());
+		assertEquals(LocalDate.parse("2021-10-01"), log.getDate());
 		assertEquals("HikariPool-1 - Start completed.", log.getContent());
 	}
 

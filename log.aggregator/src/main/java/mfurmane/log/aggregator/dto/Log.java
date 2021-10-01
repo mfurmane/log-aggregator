@@ -1,6 +1,8 @@
 package mfurmane.log.aggregator.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,8 +21,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import mfurmane.log.aggregator.datemapper.LocalDateTimeDeserializer;
-import mfurmane.log.aggregator.datemapper.LocalDateTimeSerializer;
+import mfurmane.log.aggregator.datemapper.LocalTimeDeserializer;
+import mfurmane.log.aggregator.datemapper.LocalTimeSerializer;
+import mfurmane.log.aggregator.datemapper.LocalDateDeserializer;
+import mfurmane.log.aggregator.datemapper.LocalDateSerializer;
 
 @Getter
 @Setter
@@ -36,9 +40,12 @@ public class Log {
 	private Long id;
 	private String application;
 	
-	@JsonSerialize(using = LocalDateTimeSerializer.class)
-	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
-	private LocalDateTime time;
+	@JsonSerialize(using = LocalDateSerializer.class)
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	private LocalDate date;
+	@JsonSerialize(using = LocalTimeSerializer.class)
+	@JsonDeserialize(using = LocalTimeDeserializer.class)
+	private LocalTime time;
 	private Level loggingLevel;
 	private String sourceClass;
 	@Lob

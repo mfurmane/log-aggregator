@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -41,7 +40,8 @@ public class LogServiceImpl implements LogService {
 		LocalDateTime start = LocalDateTime.parse(startDate);
 		LocalDateTime end = LocalDateTime.parse(endDate);
 		Pageable pageable = PageRequest.of(page, pageSize);
-		List<Log> findAll = repository.findAllByApplicationAndTimeBetween(application, start, end, pageable);
+		List<Log> findAll = repository.findAllByApplicationAndTimeBetween(application, start.toLocalTime(),
+				end.toLocalTime(), start.toLocalDate(), end.toLocalDate(), pageable);
 		try {
 			if (xml) {
 				XmlMapper xmlMapper = new XmlMapper();

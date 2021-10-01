@@ -2,6 +2,7 @@ package mfurmane.log.aggregator.tools;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,13 +28,15 @@ public class LogParser {
 
 	private Log parseLine(String line, String application) {
 		LineHolder lineHolder = new LineHolder(line);
-		Level logginglevel = findLevel(lineHolder);
-		String sourceClass = findSourceClass(lineHolder);
-		LocalDateTime time = findTime(lineHolder);
+		LogBuilder builder = new LogBuilder();
+		builder.application(application);
+		builder.loggingLevel(findLevel(lineHolder));
+		builder.sourceClass(findSourceClass(lineHolder));
+		findTime(lineHolder, builder);
 		lineHolder.line = lineHolder.line.replaceAll("^[ \\t:-]+", "").replaceAll("[ \\t]+$", "").replaceAll("\\s\\s+",
 				" ");
-		String content = findContent(lineHolder.line);
-		return new Log(null, application, time, logginglevel, sourceClass, content);
+		builder.content(lineHolder.line);
+		return builder.build();
 	}
 
 	private Level findLevel(LineHolder line) {
@@ -46,22 +49,21 @@ public class LogParser {
 		return Level.INFO;
 	}
 
-	private LocalDateTime findTime(LineHolder line) {
+	private void findTime(LineHolder line, LogBuilder builder) {
 		String datetime = checkDateTimeFormat(line, fullDateTimeRegex);
 		if (datetime != null) {
-			return LocalDateTime.parse(datetime.replace(" ", "T"));
+			LocalDateTime dt = LocalDateTime.parse(datetime.replace(" ", "T"));
+			builder.date(dt.toLocalDate());
+			builder.time(dt.toLocalTime());
 		}
 		datetime = checkDateTimeFormat(line, justDateRegex);
 		if (datetime != null) {
-			datetime = datetime.concat("T00:00:00");
-			return LocalDateTime.parse(datetime);
+			builder.date(LocalDate.parse(datetime));
 		}
 		datetime = checkDateTimeFormat(line, justTimeRegex);
 		if (datetime != null) {
-			datetime = LocalDate.EPOCH.toString().concat("T").concat(datetime);
-			return LocalDateTime.parse(datetime);
+			builder.time(LocalTime.parse(datetime));
 		}
-		return null;
 	}
 
 	private String checkDateTimeFormat(LineHolder line, String regex) {
@@ -82,10 +84,6 @@ public class LogParser {
 			return line.remove(matcher.group());
 		}
 		return null;
-	}
-
-	private String findContent(String line) {
-		return line;
 	}
 
 	private class LineHolder {
