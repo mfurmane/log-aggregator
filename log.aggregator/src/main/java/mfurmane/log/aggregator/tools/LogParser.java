@@ -1,6 +1,5 @@
 package mfurmane.log.aggregator.tools;
 
-import java.lang.System.Logger.Level;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,6 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.event.Level;
 import org.springframework.stereotype.Component;
 
 import mfurmane.log.aggregator.dto.Log;
@@ -30,23 +30,20 @@ public class LogParser {
 		Level logginglevel = findLevel(lineHolder);
 		String sourceClass = findSourceClass(lineHolder);
 		LocalDateTime time = findTime(lineHolder);
-		lineHolder.line = lineHolder.line.replaceAll("^[ \\t:-]+", "").replaceAll("[ \\t]+$", "").replaceAll("\\s\\s+", " ");
+		lineHolder.line = lineHolder.line.replaceAll("^[ \\t:-]+", "").replaceAll("[ \\t]+$", "").replaceAll("\\s\\s+",
+				" ");
 		String content = findContent(lineHolder.line);
 		return new Log(null, application, time, logginglevel, sourceClass, content);
 	}
 
 	private Level findLevel(LineHolder line) {
 		for (Level level : Level.values()) {
-			if (line.line.contains(level.getName())) {
-				line.remove(level.getName());
+			if (line.line.contains(level.name())) {
+				line.remove(level.name());
 				return level;
 			}
 		}
-		if (line.line.contains("WARN")) {
-			line.remove("WARN");
-			return Level.WARNING;
-		}
-		return Level.ALL;
+		return Level.INFO;
 	}
 
 	private LocalDateTime findTime(LineHolder line) {

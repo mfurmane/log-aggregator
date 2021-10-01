@@ -1,6 +1,5 @@
 package mfurmane.log.aggregator.dto;
 
-import java.lang.System.Logger.Level;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -8,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+
+import org.slf4j.event.Level;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
