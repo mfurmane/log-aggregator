@@ -25,15 +25,12 @@ public class LogServiceImpl implements LogService {
 
 	private static final String message = "Logs added: ?";
 
-	@Autowired
 	private LogRepository repository;
-	@Autowired
 	private LogParser parser;
 
 	@Override
 	public String registerLogs(String body, String application) {
 		List<Log> logs = parser.parse(body, application);
-		logs.forEach(log -> System.out.println(log.toString()));
 		logs.forEach(log -> repository.save(log));
 		return message.replace("?", Integer.valueOf(logs.size()).toString());
 	}
@@ -93,6 +90,16 @@ public class LogServiceImpl implements LogService {
 	private class DateAndTime {
 		LocalDate date;
 		LocalTime time;
+	}
+
+	@Autowired
+	public void setRepository(LogRepository repository) {
+		this.repository = repository;
+	}
+
+	@Autowired
+	public void setParser(LogParser parser) {
+		this.parser = parser;
 	}
 
 }

@@ -14,8 +14,7 @@ import mfurmane.log.aggregator.services.LogService;
 @RequestMapping("/log")
 public class LogController {
 
-	@Autowired
-	LogService logService;
+	private LogService logService;
 
 	@PostMapping("/register")
 	String registerLogs(@RequestBody String body, @RequestParam(name = "application") String application) {
@@ -29,6 +28,11 @@ public class LogController {
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "pageSize", defaultValue = "20") int pageSize) {
 		return logService.getLogs(application, startDate, endDate, xml, page, pageSize);
+	}
+
+	@Autowired
+	public void setLogService(LogService logService) {
+		this.logService = logService;
 	}
 
 }
