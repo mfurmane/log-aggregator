@@ -1,6 +1,9 @@
 package mfurmane.log.aggregator.services.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +40,12 @@ public class LogServiceImpl implements LogService {
 
 	@Override
 	public String getLogs(String application, String startDate, String endDate, Boolean xml, int page, int pageSize) {
-		LocalDateTime start = LocalDateTime.parse(startDate);
-		LocalDateTime end = LocalDateTime.parse(endDate);
+		DateAndTime startDateAndTime = new DateAndTime();
+		DateAndTime endDateAndTime = new DateAndTime();
+		parseDateAndTime(startDate, startDateAndTime);
+		parseDateAndTime(endDate, endDateAndTime);
 		Pageable pageable = PageRequest.of(page, pageSize);
-		List<Log> findAll = repository.findAllByApplicationAndTimeBetween(application, start.toLocalTime(),
-				end.toLocalTime(), start.toLocalDate(), end.toLocalDate(), pageable);
+		List<Log> findAll = callRepository(application, startDateAndTime, endDateAndTime, pageable);
 		try {
 			if (xml) {
 				XmlMapper xmlMapper = new XmlMapper();
@@ -54,6 +58,41 @@ public class LogServiceImpl implements LogService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void parseDateAndTime(String startDate, DateAndTime dateAndTime) {
+		try {
+			LocalDateTime start = LocalDateTime.parse(startDate);
+			dateAndTime.time = start.toLocalTime();
+			dateAndTime.date = start.toLocalDate();
+		} catch (DateTimeParseException e) {
+			try {
+				dateAndTime.time = LocalTime.parse(startDate);
+			} catch (DateTimeParseException e2) {
+				dateAndTime.date = LocalDate.parse(startDate);
+			}
+		}
+	}
+
+	private List<Log> callRepository(String application, DateAndTime startDateAndTime, DateAndTime endDateAndTime,
+			Pageable pageable) {
+		List<Log> findAll;
+		if (startDateAndTime.date == null) {
+			findAll = repository.findAllByApplicationAndTimeBetween(application, startDateAndTime.time,
+					endDateAndTime.time, pageable);
+		} else if (startDateAndTime.time == null) {
+			findAll = repository.findAllByApplicationAndDateBetween(application, startDateAndTime.date,
+					endDateAndTime.date, pageable);
+		} else {
+			findAll = repository.findAllByApplicationAndDatetimeBetween(application, startDateAndTime.time,
+					endDateAndTime.time, startDateAndTime.date, endDateAndTime.date, pageable);
+		}
+		return findAll;
+	}
+
+	private class DateAndTime {
+		LocalDate date;
+		LocalTime time;
 	}
 
 }
